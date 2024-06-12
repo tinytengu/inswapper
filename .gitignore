@@ -178,7 +178,7 @@ pyrightconfig.json
 # Project
 .DS_Store
 result.png
-checkpoints/*
+checkpoints/**
 !checkpoints/.gitkeep
 !checkpoints/models/.gitkeep
 data
