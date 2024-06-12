@@ -1,43 +1,49 @@
 # inswapper
 
-One-click Face Swapper and Restoration powered by [insightface](https://github.com/deepinsight/insightface). We don't use the name ROOP here, as the credit should be given to the group that develops this great face swap model.
+This is a fork of [inswapper](https://github.com/haofanwang/inswapper) project by [haofanwang](https://github.com/haofanwang) modified to my needs.
 
-## News
-🔥 We release [InstantID](https://github.com/InstantID/InstantID) as a state-of-the-art ID preservering generation method.
-
-<left><img src="https://github.com/haofanwang/inswapper/raw/main/data/mans1.jpeg" width="49%" height="49%"></left> 
-<right><img src="https://github.com/haofanwang/inswapper/raw/main/result.png" width="49%" height="49%"></right> 
+## Changes
+- Moved [CodeFormer](https://github.com/sczhou/CodeFormer) to a Git submodule. No need to clone it separately.
+- Added [Bye-lemon](https://github.com/Bye-lemon)'s for ok [py-lmdb](https://github.com/Bye-lemon/py-lmdb). No more `Building py-lmdb from source on Windows requires the "patch-ng" python module` error on newer python versions.
 
 ## Installation
-
+### 0. Clone this repository
 ```bash
-# git clone this repository
-git clone https://github.com/haofanwang/inswapper.git
+git clone https://github.com/tinytengu/inswapper.git
 cd inswapper
+```
 
-# create a Python venv
+### 1. Activate a Python virtual environment
+```bash
 python3 -m venv venv
-
-# activate the venv
 source venv/bin/activate
+```
 
-# install required packages
+### 2. Install py-lmdb
+```bash
+pip install ./py-lmdb/
+```
+
+### 3. CodeFormer dependencies
+```bash
+pip install -r CodeFormer/requirements.txt
+```
+
+### 4. Inswapper dependencies
+```bash
 pip install -r requirements.txt
 ```
 
-You have to install ``onnxruntime-gpu`` manually to enable GPU inference, install ``onnxruntime`` by default to use CPU only inference.
+### 5. (Optional) Onnxruntime GPU support
+```bash
+pip install onnxruntime-gpu
+```
 
 ## Download Checkpoints
-
-First, you need to download [face swap model](https://github.com/facefusion/facefusion-assets/releases/download/models/inswapper_128.onnx) and save it under `./checkpoints`. To obtain better result, it is highly recommended to improve image quality with face restoration model. Here, we use [CodeFormer](https://github.com/sczhou/CodeFormer). You can finish all as following, required models will be downloaded automatically when you first run the inference.
+Inswapper requires a [Face Swap Model](https://github.com/facefusion/facefusion-assets/releases/download/models/inswapper_128.onnx) to run. You can download it from the [release page](https://github.com/facefusion/facefusion-assets/releases/tag/models). To obtain better result, it is highly recommended to improve image quality with face restoration model. Here, we use [CodeFormer](https://github.com/sczhou/CodeFormer). You can finish all as following, required models will be downloaded automatically when you first run the inference.
 
 ```bash
-mkdir checkpoints
 wget -O ./checkpoints/inswapper_128.onnx https://github.com/facefusion/facefusion-assets/releases/download/models/inswapper_128.onnx
-
-cd ..
-git lfs install
-git clone https://huggingface.co/spaces/sczhou/CodeFormer
 ```
 
 
@@ -67,9 +73,3 @@ python swapper.py \
 --codeformer_fidelity=0.5
 ```
 You will obtain the exact result as above.
-
-## Acknowledgement
-This project is inspired by [inswapper](https://huggingface.co/deepinsight/inswapper/tree/main), thanks [insightface.ai](https://insightface.ai/) for releasing their powerful face swap model that makes this happen. Our codebase is built on the top of [sd-webui-roop](https://github.com/s0md3v/sd-webui-roop) and [CodeFormer](https://huggingface.co/spaces/sczhou/CodeFormer).
-
-## Contact
-If you have any issue, feel free to contact me via haofanwang.ai@gmail.com.

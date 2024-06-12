@@ -2,7 +2,6 @@ pillow>=9.5.0
 protobuf>=4.23.2
 addict
 future
-lmdb
 numpy
 opencv-python
 Pillow
