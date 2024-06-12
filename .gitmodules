@@ -1,0 +1,6 @@
+[submodule "CodeFormer"]
+	path = CodeFormer
+	url = https://github.com/sczhou/CodeFormer.git
+[submodule "py-lmdb"]
+	path = py-lmdb
+	url = https://github.com/Bye-lemon/py-lmdb.git

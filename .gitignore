@@ -175,10 +175,11 @@ pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 
+# Project
 .DS_Store
 .idea
 result.png
-CodeFormer
 checkpoints
+!checkpoints/.gitkeep
 venv
 data
