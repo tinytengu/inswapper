@@ -1,5 +1,6 @@
 import sys
-sys.path.append('./CodeFormer/CodeFormer')
+
+sys.path.append("./CodeFormer/CodeFormer")
 
 import os
 import cv2
@@ -16,24 +17,48 @@ from basicsr.utils.realesrgan_utils import RealESRGANer
 from basicsr.utils.registry import ARCH_REGISTRY
 
 
-def check_ckpts():
+def verify_checkpoints():
     pretrain_model_url = {
-        'codeformer': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/codeformer.pth',
-        'detection': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/detection_Resnet50_Final.pth',
-        'parsing': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/parsing_parsenet.pth',
-        'realesrgan': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/RealESRGAN_x2plus.pth'
+        "codeformer": "https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/codeformer.pth",
+        "detection": "https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/detection_Resnet50_Final.pth",
+        "parsing": "https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/parsing_parsenet.pth",
+        "realesrgan": "https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/RealESRGAN_x2plus.pth",
     }
     # download weights
-    if not os.path.exists('CodeFormer/CodeFormer/weights/CodeFormer/codeformer.pth'):
-        load_file_from_url(url=pretrain_model_url['codeformer'], model_dir='CodeFormer/CodeFormer/weights/CodeFormer', progress=True, file_name=None)
-    if not os.path.exists('CodeFormer/CodeFormer/weights/facelib/detection_Resnet50_Final.pth'):
-        load_file_from_url(url=pretrain_model_url['detection'], model_dir='CodeFormer/CodeFormer/weights/facelib', progress=True, file_name=None)
-    if not os.path.exists('CodeFormer/CodeFormer/weights/facelib/parsing_parsenet.pth'):
-        load_file_from_url(url=pretrain_model_url['parsing'], model_dir='CodeFormer/CodeFormer/weights/facelib', progress=True, file_name=None)
-    if not os.path.exists('CodeFormer/CodeFormer/weights/realesrgan/RealESRGAN_x2plus.pth'):
-        load_file_from_url(url=pretrain_model_url['realesrgan'], model_dir='CodeFormer/CodeFormer/weights/realesrgan', progress=True, file_name=None)
-    
-    
+    if not os.path.exists("CodeFormer/CodeFormer/weights/CodeFormer/codeformer.pth"):
+        load_file_from_url(
+            url=pretrain_model_url["codeformer"],
+            model_dir="CodeFormer/CodeFormer/weights/CodeFormer",
+            progress=True,
+            file_name=None,
+        )
+    if not os.path.exists(
+        "CodeFormer/CodeFormer/weights/facelib/detection_Resnet50_Final.pth"
+    ):
+        load_file_from_url(
+            url=pretrain_model_url["detection"],
+            model_dir="CodeFormer/CodeFormer/weights/facelib",
+            progress=True,
+            file_name=None,
+        )
+    if not os.path.exists("CodeFormer/CodeFormer/weights/facelib/parsing_parsenet.pth"):
+        load_file_from_url(
+            url=pretrain_model_url["parsing"],
+            model_dir="CodeFormer/CodeFormer/weights/facelib",
+            progress=True,
+            file_name=None,
+        )
+    if not os.path.exists(
+        "CodeFormer/CodeFormer/weights/realesrgan/RealESRGAN_x2plus.pth"
+    ):
+        load_file_from_url(
+            url=pretrain_model_url["realesrgan"],
+            model_dir="CodeFormer/CodeFormer/weights/realesrgan",
+            progress=True,
+            file_name=None,
+        )
+
+
 # set enhancer with RealESRGAN
 def set_realesrgan():
     half = True if torch.cuda.is_available() else False
@@ -57,25 +82,40 @@ def set_realesrgan():
     return upsampler
 
 
-def face_restoration(img, background_enhance, face_upsample, upscale, codeformer_fidelity, upsampler, codeformer_net, device):
+def face_restoration(
+    img,
+    background_enhance,
+    face_upsample,
+    upscale,
+    codeformer_fidelity,
+    upsampler,
+    codeformer_net,
+    device,
+):
     """Run a single prediction on the model"""
-    try: # global try
+    try:  # global try
         # take the default setting for the demo
         has_aligned = False
         only_center_face = False
         draw_box = False
         detection_model = "retinaface_resnet50"
 
-        background_enhance = background_enhance if background_enhance is not None else True
+        background_enhance = (
+            background_enhance if background_enhance is not None else True
+        )
         face_upsample = face_upsample if face_upsample is not None else True
         upscale = upscale if (upscale is not None and upscale > 0) else 2
 
-        upscale = int(upscale) # convert type to int
-        if upscale > 4: # avoid memory exceeded due to too large upscale
-            upscale = 4 
-        if upscale > 2 and max(img.shape[:2])>1000: # avoid memory exceeded due to too large img resolution
-            upscale = 2 
-        if max(img.shape[:2]) > 1500: # avoid memory exceeded due to too large img resolution
+        upscale = int(upscale)  # convert type to int
+        if upscale > 4:  # avoid memory exceeded due to too large upscale
+            upscale = 4
+        if (
+            upscale > 2 and max(img.shape[:2]) > 1000
+        ):  # avoid memory exceeded due to too large img resolution
+            upscale = 2
+        if (
+            max(img.shape[:2]) > 1500
+        ):  # avoid memory exceeded due to too large img resolution
             upscale = 1
             background_enhance = False
             face_upsample = False
@@ -100,7 +140,7 @@ def face_restoration(img, background_enhance, face_upsample, upscale, codeformer
             face_helper.read_image(img)
             # get face landmarks for each face
             num_det_faces = face_helper.get_face_landmarks_5(
-            only_center_face=only_center_face, resize=640, eye_dist_threshold=5
+                only_center_face=only_center_face, resize=640, eye_dist_threshold=5
             )
             # align and warp each face
             face_helper.align_warp_face()
@@ -155,5 +195,5 @@ def face_restoration(img, background_enhance, face_upsample, upscale, codeformer
         restored_img = cv2.cvtColor(restored_img, cv2.COLOR_BGR2RGB)
         return restored_img
     except Exception as error:
-        print('Global exception', error)
+        print("Global exception", error)
         return None, None
